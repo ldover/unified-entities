@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as uuid from 'uuid'
 import { parseLinks, type EntityLink } from './index.js'
+import { nameFromContentHeading, timestamp } from './util.js'
 
 
 export type EntityKind = Self | Collection | Space | Note | Log | Image | Idea | Task | Issue | Highlight | 
@@ -70,23 +71,6 @@ export const isAIKind = (e: Entity): e is AIPrompt | AIChat | AIResponse => {
 export const creatableKinds = KINDS.filter(k => !KINDS_NO_CREATE.includes(k))
 
 export const noConvert = new Set(['self', 'image', 'video'])
-
-/**
- * Unix timestamp in seconds.
- * @returns {number}
- */
-function timestamp() {
-  return Math.floor(new Date().getTime() / 1000)
-}
-
-/**
- * Convert Unix timestamp in seconds to Date
- * @param {number} ts
- * @returns {Date}
- */
-export function fromTimestamp(ts) {
-  return new Date(ts * 1000)
-}
 
 function getSignedInUser() {
   return null
@@ -453,18 +437,6 @@ function serializeEntity(entity: Entity) {
   }
 
   return serialized
-}
-
-export const nameFromContentHeading = (content: string) => {
-  const firstLine = content.split('\n')[0]
-  if (firstLine) {
-    const match = firstLine.match(/^#\s(.+)/)
-    if (match) {
-      return match[1]
-    }
-  }
-
-  return null
 }
 
 const contentEditable = () => ({

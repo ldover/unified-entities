@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { getThrottle, notArchivedOrDeleted, getLinks, processor, stringifyLink } from './util.js'
+export { nameFromContentHeading, fromTimestamp, timestamp } from './util.js'
 import type {
   ContentEditable,
   Entity,
@@ -23,10 +24,24 @@ import type {
 } from './entities.js'
 import { KINDS, create } from './entities.js'
 
-export { KINDS, defaultName, RecursiveContainmentError, completableKinds } from './entities.js'
+export { 
+  KINDS, 
+  defaultName, 
+  RecursiveContainmentError, 
+  completableKinds, 
+  specialNames, 
+  noConvert,
+  creatableKinds,
+  isCompletable,
+  isContentEditableEntity,
+  isAIKind
+ } from './entities.js'
+
 export type {
   Entity,
+  BaseEntity,
   EntityKind,
+  EntityLink,
   Self,
   Space,
   Collection,
@@ -44,7 +59,9 @@ export type {
   Song,
   Playlist,
   CompletableEntity,
-  ParentRelation
+  ParentRelation, 
+  Completable,
+  ContentEditableEntity
 } from './entities.js'
 
 
@@ -71,19 +88,20 @@ export class EntityAPI {
   }> = []
   private entityIdMap = new Map<string, EntityKind>()
   private childMap = new Map<string, Entity[]>()
+  private alivenessWarmupTimer: ReturnType<typeof setTimeout> | null = null
+  private alivenessRefreshTimer: ReturnType<typeof setInterval> | null = null
+  private readonly alivenessRefreshMs = 30_000
+  private readonly alivenessWarmupMs = 10_000
 
-  private onUpdate?: (entity: Entity) => void
-  private onCreate?: (entity: Entity) => void
+  public onUpdate?: (entity: Entity) => void
+  public onCreate?: (entity: Entity) => void
 
 
   // Private constructor for Singleton
-  private constructor(options: Partial<EntityAPIOptions> = {}) {
+  private constructor() {
     KINDS.forEach((key) => {
       this.entities[key] = []
     })
-
-    this.onUpdate = options.onUpdate
-    this.onCreate = options.onCreate
   }
 
   public static getInstance(): EntityAPI {
@@ -119,10 +137,24 @@ export class EntityAPI {
     this.addLinks(this.entities)
     this.addBacklinks(this.entities)
     this.computeAliveness()
+    this.ensureAlivenessRefresh()
   }
 
   public getRoot(): Self | null {
     return this.entities['self'][0] as Self || null
+  }
+
+  private ensureAlivenessRefresh() {
+    if (this.alivenessRefreshTimer || this.alivenessWarmupTimer) {
+      return
+    }
+
+    this.alivenessWarmupTimer = setTimeout(() => {
+      this.alivenessWarmupTimer = null
+      this.alivenessRefreshTimer = setInterval(() => {
+        this.computeAliveness()
+      }, this.alivenessRefreshMs)
+    }, this.alivenessWarmupMs)
   }
 
   public getChildren(entity: Entity): Entity[] {
