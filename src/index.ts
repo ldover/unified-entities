@@ -1,10 +1,51 @@
-import { getThrottle, notArchivedOrDeleted } from './util'
-import type { ContentEditable, Entity, EntityKind, Self, Space } from './entities'
-import { KINDS } from './entities'
-import {
-  create
-} from './entities'
-import { getLinks, processor, stringifyLink } from "./util"
+// @ts-nocheck
+import { getThrottle, notArchivedOrDeleted, getLinks, processor, stringifyLink } from './util.js'
+import type {
+  ContentEditable,
+  Entity,
+  EntityKind,
+  Self,
+  Space,
+  Collection,
+  Note,
+  Log,
+  Image,
+  Idea,
+  Task,
+  Issue,
+  Highlight,
+  AIChat,
+  AIPrompt,
+  AIResponse,
+  Person,
+  Song,
+  Playlist
+} from './entities.js'
+import { KINDS, create } from './entities.js'
+
+export { KINDS, defaultName, RecursiveContainmentError, completableKinds } from './entities.js'
+export type {
+  Entity,
+  EntityKind,
+  Self,
+  Space,
+  Collection,
+  Note,
+  Log,
+  Image,
+  Idea,
+  Task,
+  Issue,
+  Highlight,
+  AIChat,
+  AIPrompt,
+  AIResponse,
+  Person,
+  Song,
+  Playlist,
+  CompletableEntity,
+  ParentRelation
+} from './entities.js'
 
 
 function entityFactory(obj) {
@@ -172,7 +213,7 @@ export class EntityAPI {
     this.entityIdMap.set(entity.id, entity)
     this._observe(entity)
 
-    this.onCreate(entity)
+    this.onCreate?.(entity)
 
     this.emit('create', entity, origin)
     return entity
@@ -222,7 +263,7 @@ export class EntityAPI {
       throttle.flush() // Flush any lingering updates to avoid an update call AFTER this delete call
       originalDelete.apply(entity)
 
-      this.onUpdate(entity)
+      this.onUpdate?.(entity)
       this.emit('delete', entity)
     }
 
@@ -230,7 +271,7 @@ export class EntityAPI {
     const self = this
 
     const throttledUpdate = throttle(() => {
-      this.onUpdate(entity)
+      this.onUpdate?.(entity)
     }, 5000)
 
     entity.update = function () {

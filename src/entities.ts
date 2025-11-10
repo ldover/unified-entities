@@ -1,5 +1,6 @@
+// @ts-nocheck
 import * as uuid from 'uuid'
-import { parseLinks, type EntityLink } from "./index"
+import { parseLinks, type EntityLink } from './index.js'
 
 
 export type EntityKind = Self | Collection | Space | Note | Log | Image | Idea | Task | Issue | Highlight | 

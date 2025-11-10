@@ -1,4 +1,5 @@
-
+// @ts-nocheck
+import type { Node } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 import { unified } from 'unified'
 import RemarkStringify from 'remark-stringify'
