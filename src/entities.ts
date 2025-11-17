@@ -70,7 +70,7 @@ export const isAIKind = (e: Entity): e is AIPrompt | AIChat | AIResponse => {
 
 export const creatableKinds = KINDS.filter(k => !KINDS_NO_CREATE.includes(k))
 
-export const noConvert = new Set(['self', 'image', 'video'])
+export const noConvert = new Set(['self', 'image'])
 
 function getSignedInUser() {
   return null
@@ -275,15 +275,26 @@ export interface Equation extends BaseEntity {
   kind: 'equation'
 }
 
-export interface Video extends BaseEntity, Completable {
-  kind: 'video'
+export interface MediaResource {
+  mime_type: string | null
+}
 
+export interface MediaWithDimensions {
+  height: number | null
+  width: number | null
+}
+
+export interface MediaWithDuration {
+  duration: number | null
+}
+
+export interface Video extends BaseEntity, Completable, MediaResource, MediaWithDuration, MediaWithDimensions {
+  kind: 'video'
   src: string | null
 }
 
-export interface Song extends BaseEntity {
+export interface Song extends BaseEntity, MediaResource, MediaWithDuration {
   kind: 'song'
-
   src: string | null
 }
 
@@ -337,6 +348,8 @@ export interface Review extends BaseEntity {
 
 export interface Playlist extends BaseEntity {
   kind: 'playlist'
+
+  src: string | null
 }
 
 export interface AIChat extends BaseEntity {
@@ -365,12 +378,9 @@ export interface AIResponse extends BaseEntity {
   cancelStream(): Promise<void>
 }
 
-export interface Image extends Entity {
+export interface Image extends Entity, MediaResource, MediaWithDimensions {
   kind: 'image'
   src: string | null
-  mime_type: string
-  height: number
-  width: number
 }
 
 export interface Self extends BaseEntity {
@@ -878,7 +888,12 @@ const kindMethods = (() => {
     log: {
       ...base(),
     },
+    playlist: {
+      ...base(),
+      ...withSource(),
+    },
     video: {
+      ...base(),
       ...withSource(),
     },
     song: {
@@ -926,20 +941,28 @@ const kindProps = (() => {
       ...renderableProps(),
     }),
     video: () => ({
+      ...renderableProps(),
       src: null,
+      duration: null,
+      mime_type: null,
+      height: null,
+      width: null,
     }),
     song: () => ({
       ...renderableProps(),
       src: null,
+      duration: null,
+      mime_type: null,
     }),
     playlist: () => ({
       ...renderableProps(),
+      src: null,
     }),
     image: () => ({
       src: null,
-      height: 0,
-      width: 0,
-      mime_type: ''
+      height: null,
+      width: null,
+      mime_type: null,
     }),
     space: () => ({
       ...renderableProps(),
