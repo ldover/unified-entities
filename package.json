@@ -2,7 +2,16 @@
   "name": "unified-entities",
   "version": "0.0.1",
   "type": "module",
+  "author": "Luka Dover <luka.dover@gmail.com>",
+  "license": "UNLICENSED",
   "description": "Object graph for the unified data system",
+  "publishConfig": {
+		"access": "public"
+	},
+  "repository": {
+		"type": "git",
+		"url": "git+https://github.com/ldover/unified-entities.git"
+	},
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
