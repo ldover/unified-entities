@@ -5,7 +5,7 @@ import { nameFromContentHeading, timestamp } from './util.js'
 
 
 export type EntityKind = Self | Collection | Space | Note | Log | Image | Idea | Task | Issue | Highlight | 
-                         AIChat | AIPrompt | AIResponse | Person | Song | Playlist
+                         AIChat | AIPrompt | AIResponse | Person | Song | Audio | Playlist
 
 
              
@@ -33,6 +33,7 @@ export const KINDS = [
   'equation',
   'video',
   'song',
+  'audio',
   'playlist',
   'question',
   'review',
@@ -295,6 +296,11 @@ export interface Video extends BaseEntity, Completable, MediaResource, MediaWith
 
 export interface Song extends BaseEntity, MediaResource, MediaWithDuration {
   kind: 'song'
+  src: string | null
+}
+
+export interface Audio extends BaseEntity, MediaResource, MediaWithDuration {
+  kind: 'audio'
   src: string | null
 }
 
@@ -900,6 +906,10 @@ const kindMethods = (() => {
       ...base(),
       ...withSource(),
     },
+    audio: {
+      ...base(),
+      ...withSource(),
+    },
     image: {
       ...withSource(),
     },
@@ -919,6 +929,12 @@ const kindMethods = (() => {
 
 const renderableProps = () => ({ content: '' })
 const completableProps = () => ({ completed: false, completed_at: null })
+const mediaProps = () => ({
+  ...renderableProps(),
+  src: null,
+  duration: null,
+  mime_type: null,
+})
 
 const kindProps = (() => {
   const base: Record<string, () => object> = {
@@ -941,19 +957,12 @@ const kindProps = (() => {
       ...renderableProps(),
     }),
     video: () => ({
-      ...renderableProps(),
-      src: null,
-      duration: null,
-      mime_type: null,
+      ...mediaProps(),
       height: null,
       width: null,
     }),
-    song: () => ({
-      ...renderableProps(),
-      src: null,
-      duration: null,
-      mime_type: null,
-    }),
+    song: () => mediaProps(),
+    audio: () => mediaProps(),
     playlist: () => ({
       ...renderableProps(),
       src: null,

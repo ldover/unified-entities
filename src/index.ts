@@ -20,6 +20,7 @@ import type {
   AIResponse,
   Person,
   Song,
+  Audio,
   Playlist
 } from './entities.js'
 import { KINDS, create } from './entities.js'
@@ -57,6 +58,7 @@ export type {
   AIResponse,
   Person,
   Song,
+  Audio,
   Video,
   Playlist,
   Concept,
