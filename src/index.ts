@@ -21,6 +21,7 @@ import type {
   Person,
   Song,
   Audio,
+  Document,
   Playlist
 } from './entities.js'
 import { KINDS, create } from './entities.js'
@@ -59,6 +60,7 @@ export type {
   Person,
   Song,
   Audio,
+  Document,
   Video,
   Playlist,
   Concept,

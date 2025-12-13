@@ -4,8 +4,8 @@ import { parseLinks, type EntityLink } from './index.js'
 import { nameFromContentHeading, timestamp } from './util.js'
 
 
-export type EntityKind = Self | Collection | Space | Note | Log | Image | Idea | Task | Issue | Highlight | 
-                         AIChat | AIPrompt | AIResponse | Person | Song | Audio | Playlist
+export type EntityKind = Self | Collection | Space | Note | Log | Image | Idea | Task | Issue | Highlight |
+                         AIChat | AIPrompt | AIResponse | Person | Song | Audio | Playlist | Document
 
 
              
@@ -27,6 +27,7 @@ export const KINDS = [
   'book',
   'highlight',
   'article',
+  'document',
   'person',
   'post',
   'comment',
@@ -306,6 +307,7 @@ export interface Audio extends BaseEntity, MediaResource, MediaWithDuration {
 
 export interface Book extends BaseEntity, Completable {
   kind: 'book'
+  src: string | null
 }
 
 export interface Question extends BaseEntity, Completable {
@@ -314,6 +316,12 @@ export interface Question extends BaseEntity, Completable {
 
 export interface Article extends BaseEntity, Completable {
   kind: 'article'
+}
+
+export interface Document extends BaseEntity {
+  kind: 'document'
+  src: string | null
+  mime_type: string | null
 }
 
 export interface Post extends BaseEntity, Completable {
@@ -910,6 +918,14 @@ const kindMethods = (() => {
       ...base(),
       ...withSource(),
     },
+    document: {
+      ...base(),
+      ...withSource(),
+    },
+    book: {
+      ...base(),
+      ...withSource(),
+    },
     image: {
       ...withSource(),
     },
@@ -953,8 +969,16 @@ const kindProps = (() => {
       model: '',
       ok: null
     }),
+    book: () => ({
+      src: null,
+    }),
     log: () => ({
       ...renderableProps(),
+    }),
+    document: () => ({
+      ...renderableProps(),
+      src: null,
+      mime_type: null,
     }),
     video: () => ({
       ...mediaProps(),
