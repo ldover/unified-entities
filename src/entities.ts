@@ -962,7 +962,7 @@ const kindProps = (() => {
     aichat: () => ({
       ...renderableProps(),
       model: null,
-      system: defaultSystemPrompt,
+      system: null,
     }),
     aiprompt: () => ({
       ...renderableProps(),
