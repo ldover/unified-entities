@@ -308,6 +308,7 @@ export interface Audio extends BaseEntity, MediaResource, MediaWithDuration {
 export interface Book extends BaseEntity, Completable {
   kind: 'book'
   src: string | null
+  mime_type: string | null
 }
 
 export interface Question extends BaseEntity, Completable {
@@ -971,6 +972,7 @@ const kindProps = (() => {
     }),
     book: () => ({
       src: null,
+      mime_type: null,
     }),
     log: () => ({
       ...renderableProps(),
