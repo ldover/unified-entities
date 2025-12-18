@@ -512,7 +512,11 @@ const withSource = () => ({
 })
 
 // Increase the max number of listeners for prod to prevent false positives
-const MAX_LISTENERS = import.meta.env.DEV ? 5 : 25
+const IS_DEV = Boolean(
+  import.meta?.env?.DEV ??
+  (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production')
+)
+const MAX_LISTENERS = IS_DEV ? 5 : 25
 
 const baseEntityMethods = () => ({
   on(event: string, listener: Function, instance?: any) {
